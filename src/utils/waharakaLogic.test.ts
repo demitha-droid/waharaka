@@ -10,6 +10,7 @@ import {
   toggleOfflineReadingRecord,
   calculateOfflineStorageStats,
   getReadingProgressPercent,
+  paginateItems,
   type SermonItem,
   type CDCollection,
 } from './waharakaLogic';
@@ -131,4 +132,25 @@ test('batchSaveCDToOffline saves all tracks of a CD collection and calculates st
 test('getReadingProgressPercent returns accurate page percentage', () => {
   assert.equal(getReadingProgressPercent(100, 400), 25);
   assert.equal(getReadingProgressPercent(400, 400), 100);
+});
+
+test('paginateItems slices 15 posts per page and generates numbered pages 1, 2, 3...', () => {
+  const dummyPosts = Array.from({ length: 40 }, (_, i) => `Post-${i + 1}`);
+  const page1 = paginateItems(dummyPosts, 1, 15);
+  assert.equal(page1.items.length, 15);
+  assert.equal(page1.items[0], 'Post-1');
+  assert.equal(page1.items[14], 'Post-15');
+  assert.equal(page1.totalPages, 3);
+  assert.deepEqual(page1.pageNumbers, [1, 2, 3]);
+
+  const page2 = paginateItems(dummyPosts, 2, 15);
+  assert.equal(page2.items.length, 15);
+  assert.equal(page2.items[0], 'Post-16');
+  assert.equal(page2.items[14], 'Post-30');
+  assert.equal(page2.startIndex, 15);
+
+  const page3 = paginateItems(dummyPosts, 3, 15);
+  assert.equal(page3.items.length, 10);
+  assert.equal(page3.items[0], 'Post-31');
+  assert.equal(page3.items[9], 'Post-40');
 });

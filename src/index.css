@@ -42,3 +42,12 @@
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
+/* Android Status Bar & Gesture Navigation Safe Area Clearance */
+.pt-android-safe {
+  padding-top: max(env(safe-area-inset-top, 0px), 2.5rem);
+}
+
+.pb-android-safe {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 0.75rem);
+}

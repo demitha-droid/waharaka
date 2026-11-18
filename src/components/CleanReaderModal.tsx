@@ -305,7 +305,7 @@ export const CleanReaderModal: React.FC<CleanReaderModalProps> = ({
         className={`flex-1 flex flex-col w-full max-w-7xl mx-auto my-0 sm:my-3 sm:rounded-2xl overflow-hidden border border-stone-300 dark:border-stone-800 shadow-2xl ${surfaceStyles[surface]}`}
       >
         {/* Clean Reader Top Bar */}
-        <div className="px-4 sm:px-6 py-3 border-b border-stone-300/60 dark:border-stone-800 flex flex-wrap items-center justify-between gap-3 bg-black/5 dark:bg-white/5">
+        <div className="px-4 sm:px-6 pt-android-safe pb-3 border-b border-stone-300/60 dark:border-stone-800 flex flex-wrap items-center justify-between gap-3 bg-black/5 dark:bg-white/5">
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <button
               type="button"

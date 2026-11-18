@@ -5,10 +5,6 @@ import {
   Sun,
   Bell,
   HardDriveDownload,
-  Radio,
-  Disc,
-  BookOpen,
-  Library,
   X,
 } from 'lucide-react';
 
@@ -33,7 +29,6 @@ interface TopBarProps {
 }
 
 export const TopBar: React.FC<TopBarProps> = ({
-  activeTab,
   onSelectTab,
   searchQuery,
   onSearchChange,
@@ -45,18 +40,14 @@ export const TopBar: React.FC<TopBarProps> = ({
   onlyOfflineFilter,
   onToggleOnlyOffline,
 }) => {
-  const navItems: { id: ActiveTab; label: string; icon: React.ReactNode }[] = [
-    { id: 'sermons', label: 'Sermons', icon: <Radio className="w-4 h-4" /> },
-    { id: 'cds', label: 'CDs', icon: <Disc className="w-4 h-4" /> },
-    { id: 'magazines', label: 'Magazines', icon: <BookOpen className="w-4 h-4" /> },
-    { id: 'books', label: 'Books', icon: <Library className="w-4 h-4" /> },
-  ];
-
   const totalOfflineCount = offlineStats.sermonCount + offlineStats.readingCount;
 
   return (
-    <div className="bg-white dark:bg-black text-zinc-950 dark:text-white pt-3 pb-1 px-3 sm:px-6 max-w-7xl w-full mx-auto space-y-3">
-      {/* Seamless Native Android Top Row (No sticky bar or border chrome) */}
+    <div
+      data-testid="android-top-header"
+      className="bg-white dark:bg-black text-zinc-950 dark:text-white pt-android-safe pb-2 px-3 sm:px-6 max-w-7xl w-full mx-auto space-y-3"
+    >
+      {/* Android Status-Bar Safe Header Row (Never overlaps notification icons) */}
       <div className="flex items-center justify-between gap-2">
         <a
           href="#top"
@@ -148,31 +139,6 @@ export const TopBar: React.FC<TopBarProps> = ({
           </button>
         )}
       </div>
-
-      {/* Inline Android Material Segmented Section Pills (Replaces top/bottom bars) */}
-      <nav
-        aria-label="Primary sections"
-        className="grid grid-cols-4 gap-1.5 p-1 rounded-2xl bg-zinc-100 dark:bg-zinc-900/90 border border-zinc-200/70 dark:border-zinc-800/80"
-      >
-        {navItems.map((item) => {
-          const active = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => onSelectTab(item.id)}
-              className={`min-h-[40px] px-2 py-1.5 rounded-xl text-xs font-semibold flex items-center justify-center gap-1.5 transition-all whitespace-nowrap ${
-                active
-                  ? 'bg-amber-600 text-zinc-950 dark:bg-amber-500 dark:text-zinc-950 shadow-xs'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-950 dark:hover:text-white'
-              }`}
-            >
-              {item.icon}
-              <span>{item.label}</span>
-            </button>
-          );
-        })}
-      </nav>
     </div>
   );
 };

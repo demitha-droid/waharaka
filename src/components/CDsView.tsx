@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Disc,
   Play,
@@ -10,11 +10,15 @@ import {
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
-import type {
-  CDCollection,
-  SermonItem,
-  OfflineSermonPacket,
+import {
+  paginateItems,
+  type CDCollection,
+  type SermonItem,
+  type OfflineSermonPacket,
 } from '../utils/waharakaLogic';
+import { PaginationBar } from './PaginationBar';
+
+const CDS_PER_PAGE = 15;
 
 interface CDsViewProps {
   cds: CDCollection[];
@@ -40,6 +44,7 @@ export const CDsView: React.FC<CDsViewProps> = ({
   onLoadCdTracks,
 }) => {
   const [groupFilter, setGroupFilter] = useState<'all' | 'special' | 'numbered'>('all');
+  const [currentPage, setCurrentPage] = useState(1);
   const [expandedCdIds, setExpandedCdIds] = useState<Record<string, boolean>>({
     Arunodaya: true,
     'Thilakuna-Denagamu': true,
@@ -48,8 +53,18 @@ export const CDsView: React.FC<CDsViewProps> = ({
   });
   const [failedImages, setFailedImages] = useState<Record<string, boolean>>({});
 
-  const visibleCds = cds.filter(
-    (c) => groupFilter === 'all' || c.group === groupFilter
+  const visibleCds = useMemo(
+    () => cds.filter((c) => groupFilter === 'all' || c.group === groupFilter),
+    [cds, groupFilter]
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [groupFilter, visibleCds.length]);
+
+  const pagination = useMemo(
+    () => paginateItems(visibleCds, currentPage, CDS_PER_PAGE),
+    [visibleCds, currentPage]
   );
 
   const specialCount = cds.filter((c) => c.group === 'special').length;
@@ -143,243 +158,256 @@ export const CDsView: React.FC<CDsViewProps> = ({
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          {visibleCds.map((cd) => {
-            const isExpanded = Boolean(expandedCdIds[cd.id]);
-            const isLoading = Boolean(loadingCdIds[cd.id]);
-            const allTracksSaved =
-              cd.tracksLoaded &&
-              cd.tracks.length > 0 &&
-              cd.tracks.every((t) => Boolean(offlineSermons[t.id]));
+        <>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            {pagination.items.map((cd) => {
+              const isExpanded = Boolean(expandedCdIds[cd.id]);
+              const isLoading = Boolean(loadingCdIds[cd.id]);
+              const allTracksSaved =
+                cd.tracksLoaded &&
+                cd.tracks.length > 0 &&
+                cd.tracks.every((t) => Boolean(offlineSermons[t.id]));
 
-            return (
-              <section
-                key={cd.id}
-                className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-zinc-950 overflow-hidden flex flex-col justify-between"
-              >
-                <div className="p-5 space-y-4">
-                  <div className="flex gap-4 items-center">
-                    <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-stone-800 border border-stone-200 dark:border-stone-700 flex items-center justify-center">
-                      {!failedImages[cd.id] ? (
-                        <img
-                          src={cd.coverImage}
-                          alt={cd.title}
-                          loading="lazy"
-                          decoding="async"
-                          referrerPolicy="no-referrer"
-                          onError={() =>
-                            setFailedImages((prev) => ({ ...prev, [cd.id]: true }))
-                          }
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <Disc className="w-8 h-8 text-amber-400" />
-                      )}
-                    </div>
-
-                    <div className="space-y-1 flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 text-xs text-stone-500 dark:text-stone-400 font-mono-tabular">
-                        <span className="font-semibold text-amber-800 dark:text-amber-400">
-                          {cd.code}
-                        </span>
-                        <span aria-hidden="true">·</span>
-                        <span className="font-sans">{cd.series}</span>
-                        {cd.tracksLoaded && (
-                          <>
-                            <span aria-hidden="true">·</span>
-                            <span>{cd.tracks.length} Deshanas</span>
-                          </>
-                        )}
-                        {cd.zipSizeMb > 0 && (
-                          <>
-                            <span aria-hidden="true">·</span>
-                            <span>{cd.zipSizeMb} MB</span>
-                          </>
+              return (
+                <section
+                  key={cd.id}
+                  className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-zinc-950 overflow-hidden flex flex-col justify-between"
+                >
+                  <div className="p-5 space-y-4">
+                    <div className="flex gap-4 items-center">
+                      <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 bg-stone-800 border border-stone-200 dark:border-stone-700 flex items-center justify-center">
+                        {!failedImages[cd.id] ? (
+                          <img
+                            src={cd.coverImage}
+                            alt={cd.title}
+                            loading="lazy"
+                            decoding="async"
+                            referrerPolicy="no-referrer"
+                            onError={() =>
+                              setFailedImages((prev) => ({ ...prev, [cd.id]: true }))
+                            }
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <Disc className="w-8 h-8 text-amber-400" />
                         )}
                       </div>
 
-                      <h2 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-100 font-serif-display truncate">
-                        {cd.title}
-                      </h2>
-                      <p className="text-xs text-stone-600 dark:text-stone-400 truncate">
-                        {cd.sinhalaTitle}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* CD Action Controls */}
-                  <div className="flex flex-wrap items-center gap-2 pt-1">
-                    <button
-                      type="button"
-                      disabled={isLoading}
-                      onClick={() => handlePlayCd(cd)}
-                      className="min-h-[42px] px-4 py-2 rounded-xl bg-amber-800 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-500 text-white dark:text-stone-950 text-xs font-semibold flex items-center gap-2 transition-colors whitespace-nowrap shrink-0"
-                    >
-                      {isLoading ? (
-                        <>
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          <span>Loading CD...</span>
-                        </>
-                      ) : (
-                        <>
-                          <Play className="w-3.5 h-3.5 fill-current" />
-                          <span>Play CD</span>
-                        </>
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => handleToggleExpand(cd)}
-                      aria-expanded={isExpanded}
-                      className="min-h-[42px] px-3.5 py-2 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-stone-700 text-xs font-medium flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
-                    >
-                      <span>
-                        {cd.tracksLoaded
-                          ? `Tracklist (${cd.tracks.length})`
-                          : 'View Tracklist'}
-                      </span>
-                      {isExpanded ? (
-                        <ChevronUp className="w-3.5 h-3.5" />
-                      ) : (
-                        <ChevronDown className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        if (!cd.tracksLoaded) {
-                          const loaded = await onLoadCdTracks(cd.id);
-                          if (loaded) onBatchDownloadCD(loaded);
-                        } else {
-                          onBatchDownloadCD(cd);
-                        }
-                      }}
-                      className={`min-h-[42px] px-3.5 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5 border transition-colors whitespace-nowrap shrink-0 ${
-                        allTracksSaved
-                          ? 'bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
-                          : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-200 border-stone-200 dark:border-stone-700'
-                      }`}
-                    >
-                      {allTracksSaved ? (
-                        <>
-                          <Check className="w-3.5 h-3.5" />
-                          <span>Saved Offline</span>
-                        </>
-                      ) : (
-                        <>
-                          <Download className="w-3.5 h-3.5" />
-                          <span>Save Offline</span>
-                        </>
-                      )}
-                    </button>
-
-                    <a
-                      href={cd.zipUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="min-h-[42px] px-3 py-2 rounded-xl text-xs font-medium text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 flex items-center gap-1 whitespace-nowrap shrink-0"
-                    >
-                      <span>ZIP</span>
-                      <ExternalLink className="w-3 h-3" />
-                    </a>
-                  </div>
-
-                  {/* Expandable Authentic Tracklist */}
-                  {isExpanded && (
-                    <div className="border-t border-stone-200 dark:border-stone-800 pt-3 mt-2">
-                      {isLoading ? (
-                        <div className="py-6 flex items-center justify-center gap-2 text-xs text-stone-500">
-                          <Loader2 className="w-4 h-4 animate-spin text-amber-700" />
-                          <span>Fetching tracks from waharaka.com...</span>
+                      <div className="space-y-1 flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 text-xs text-stone-500 dark:text-stone-400 font-mono-tabular">
+                          <span className="font-semibold text-amber-800 dark:text-amber-400">
+                            {cd.code}
+                          </span>
+                          <span aria-hidden="true">·</span>
+                          <span className="font-sans">{cd.series}</span>
+                          {cd.tracksLoaded && (
+                            <>
+                              <span aria-hidden="true">·</span>
+                              <span>{cd.tracks.length} Deshanas</span>
+                            </>
+                          )}
+                          {cd.zipSizeMb > 0 && (
+                            <>
+                              <span aria-hidden="true">·</span>
+                              <span>{cd.zipSizeMb} MB</span>
+                            </>
+                          )}
                         </div>
-                      ) : cd.tracks.length === 0 ? (
-                        <p className="text-xs text-stone-500 py-3">
-                          Click Play CD to load tracks from waharaka.com.
+
+                        <h2 className="text-lg sm:text-xl font-bold text-stone-900 dark:text-stone-100 font-serif-display truncate">
+                          {cd.title}
+                        </h2>
+                        <p className="text-xs text-stone-600 dark:text-stone-400 truncate">
+                          {cd.sinhalaTitle}
                         </p>
-                      ) : (
-                        <div className="divide-y divide-stone-200/70 dark:divide-stone-800 max-h-80 overflow-y-auto pr-1">
-                          {cd.tracks.map((track, tIdx) => {
-                            const isCurrent = currentPlayingId === track.id;
-                            const isSaved = Boolean(offlineSermons[track.id]);
-                            return (
-                              <div
-                                key={track.id}
-                                className="py-2.5 flex items-center justify-between gap-3"
-                              >
-                                <div className="min-w-0 flex-1">
-                                  <p className="text-xs font-medium text-stone-900 dark:text-stone-100 leading-snug">
-                                    <span className="font-mono-tabular text-stone-400 mr-1.5">
-                                      {String(tIdx + 1).padStart(2, '0')}.
-                                    </span>
-                                    {track.title}
-                                  </p>
-                                  {track.question && (
-                                    <p className="text-[11px] text-stone-500 dark:text-stone-400 line-clamp-1 mt-0.5">
-                                      {track.question}
-                                    </p>
-                                  )}
-                                  <p className="text-[11px] text-stone-500 dark:text-stone-400 font-mono-tabular mt-0.5">
-                                    {track.id} · {track.durationFormatted} · {track.sizeMb} MB
-                                  </p>
-                                </div>
-
-                                <div className="flex items-center gap-1.5 shrink-0">
-                                  <button
-                                    type="button"
-                                    onClick={() => onPlaySermon(track)}
-                                    aria-label={
-                                      isCurrent && isPlaying
-                                        ? `Pause ${track.title}`
-                                        : `Play ${track.title}`
-                                    }
-                                    className={`min-h-[38px] min-w-[38px] px-2.5 rounded-lg flex items-center justify-center transition-colors ${
-                                      isCurrent && isPlaying
-                                        ? 'bg-amber-800 text-white dark:bg-amber-500 dark:text-stone-950'
-                                        : 'bg-stone-100 dark:bg-stone-800 hover:bg-amber-800 hover:text-white dark:hover:bg-amber-500 dark:hover:text-stone-950 text-stone-700 dark:text-stone-200'
-                                    }`}
-                                  >
-                                    {isCurrent && isPlaying ? (
-                                      <Pause className="w-3.5 h-3.5 fill-current" />
-                                    ) : (
-                                      <Play className="w-3.5 h-3.5 fill-current" />
-                                    )}
-                                  </button>
-
-                                  <button
-                                    type="button"
-                                    onClick={() => onToggleOfflineSermon(track)}
-                                    aria-label={
-                                      isSaved
-                                        ? `Remove ${track.title} from offline storage`
-                                        : `Download ${track.title} offline`
-                                    }
-                                    className={`min-h-[38px] min-w-[38px] px-2.5 rounded-lg border flex items-center justify-center transition-colors ${
-                                      isSaved
-                                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800'
-                                        : 'bg-stone-50 dark:bg-stone-900 text-stone-600 dark:text-stone-400 border-stone-200 dark:border-stone-700'
-                                    }`}
-                                  >
-                                    {isSaved ? (
-                                      <Check className="w-3.5 h-3.5" />
-                                    ) : (
-                                      <Download className="w-3.5 h-3.5" />
-                                    )}
-                                  </button>
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
+                      </div>
                     </div>
-                  )}
-                </div>
-              </section>
-            );
-          })}
-        </div>
+
+                    {/* CD Action Controls */}
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
+                      <button
+                        type="button"
+                        disabled={isLoading}
+                        onClick={() => handlePlayCd(cd)}
+                        className="min-h-[42px] px-4 py-2 rounded-xl bg-amber-800 hover:bg-amber-700 dark:bg-amber-600 dark:hover:bg-amber-500 text-white dark:text-stone-950 text-xs font-semibold flex items-center gap-2 transition-colors whitespace-nowrap shrink-0"
+                      >
+                        {isLoading ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            <span>Loading CD...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-3.5 h-3.5 fill-current" />
+                            <span>Play CD</span>
+                          </>
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleToggleExpand(cd)}
+                        aria-expanded={isExpanded}
+                        className="min-h-[42px] px-3.5 py-2 rounded-xl bg-stone-100 dark:bg-stone-800 hover:bg-stone-200 dark:hover:bg-stone-700 text-stone-700 dark:text-stone-200 border border-stone-200 dark:border-stone-700 text-xs font-medium flex items-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
+                      >
+                        <span>
+                          {cd.tracksLoaded
+                            ? `Tracklist (${cd.tracks.length})`
+                            : 'View Tracklist'}
+                        </span>
+                        {isExpanded ? (
+                          <ChevronUp className="w-3.5 h-3.5" />
+                        ) : (
+                          <ChevronDown className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={async () => {
+                          if (!cd.tracksLoaded) {
+                            const loaded = await onLoadCdTracks(cd.id);
+                            if (loaded) onBatchDownloadCD(loaded);
+                          } else {
+                            onBatchDownloadCD(cd);
+                          }
+                        }}
+                        className={`min-h-[42px] px-3.5 py-2 rounded-xl text-xs font-medium flex items-center gap-1.5 border transition-colors whitespace-nowrap shrink-0 ${
+                          allTracksSaved
+                            ? 'bg-emerald-50/80 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800'
+                            : 'bg-stone-100 dark:bg-stone-800 text-stone-700 dark:text-stone-200 border-stone-200 dark:border-stone-700'
+                        }`}
+                      >
+                        {allTracksSaved ? (
+                          <>
+                            <Check className="w-3.5 h-3.5" />
+                            <span>Saved Offline</span>
+                          </>
+                        ) : (
+                          <>
+                            <Download className="w-3.5 h-3.5" />
+                            <span>Save Offline</span>
+                          </>
+                        )}
+                      </button>
+
+                      <a
+                        href={cd.zipUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="min-h-[42px] px-3 py-2 rounded-xl text-xs font-medium text-stone-600 dark:text-stone-400 hover:text-stone-900 dark:hover:text-stone-200 flex items-center gap-1 whitespace-nowrap shrink-0"
+                      >
+                        <span>ZIP</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+
+                    {/* Expandable Authentic Tracklist */}
+                    {isExpanded && (
+                      <div className="border-t border-stone-200 dark:border-stone-800 pt-3 mt-2">
+                        {isLoading ? (
+                          <div className="py-6 flex items-center justify-center gap-2 text-xs text-stone-500">
+                            <Loader2 className="w-4 h-4 animate-spin text-amber-700" />
+                            <span>Fetching tracks from waharaka.com...</span>
+                          </div>
+                        ) : cd.tracks.length === 0 ? (
+                          <p className="text-xs text-stone-500 py-3">
+                            Click Play CD to load tracks from waharaka.com.
+                          </p>
+                        ) : (
+                          <div className="divide-y divide-stone-200/70 dark:divide-stone-800 max-h-80 overflow-y-auto pr-1">
+                            {cd.tracks.map((track, tIdx) => {
+                              const isCurrent = currentPlayingId === track.id;
+                              const isSaved = Boolean(offlineSermons[track.id]);
+                              return (
+                                <div
+                                  key={track.id}
+                                  className="py-2.5 flex items-center justify-between gap-3"
+                                >
+                                  <div className="min-w-0 flex-1">
+                                    <p className="text-xs font-medium text-stone-900 dark:text-stone-100 leading-snug">
+                                      <span className="font-mono-tabular text-stone-400 mr-1.5">
+                                        {String(tIdx + 1).padStart(2, '0')}.
+                                      </span>
+                                      {track.title}
+                                    </p>
+                                    {track.question && (
+                                      <p className="text-[11px] text-stone-500 dark:text-stone-400 line-clamp-1 mt-0.5">
+                                        {track.question}
+                                      </p>
+                                    )}
+                                    <p className="text-[11px] text-stone-500 dark:text-stone-400 font-mono-tabular mt-0.5">
+                                      {track.id} · {track.durationFormatted} · {track.sizeMb} MB
+                                    </p>
+                                  </div>
+
+                                  <div className="flex items-center gap-1.5 shrink-0">
+                                    <button
+                                      type="button"
+                                      onClick={() => onPlaySermon(track)}
+                                      aria-label={
+                                        isCurrent && isPlaying
+                                          ? `Pause ${track.title}`
+                                          : `Play ${track.title}`
+                                      }
+                                      className={`min-h-[38px] min-w-[38px] px-2.5 rounded-lg flex items-center justify-center transition-colors ${
+                                        isCurrent && isPlaying
+                                          ? 'bg-amber-800 text-white dark:bg-amber-500 dark:text-stone-950'
+                                          : 'bg-stone-100 dark:bg-stone-800 hover:bg-amber-800 hover:text-white dark:hover:bg-amber-500 dark:hover:text-stone-950 text-stone-700 dark:text-stone-200'
+                                      }`}
+                                    >
+                                      {isCurrent && isPlaying ? (
+                                        <Pause className="w-3.5 h-3.5 fill-current" />
+                                      ) : (
+                                        <Play className="w-3.5 h-3.5 fill-current" />
+                                      )}
+                                    </button>
+
+                                    <button
+                                      type="button"
+                                      onClick={() => onToggleOfflineSermon(track)}
+                                      aria-label={
+                                        isSaved
+                                          ? `Remove ${track.title} from offline storage`
+                                          : `Download ${track.title} offline`
+                                      }
+                                      className={`min-h-[38px] min-w-[38px] px-2.5 rounded-lg border flex items-center justify-center transition-colors ${
+                                        isSaved
+                                          ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border-emerald-300 dark:border-emerald-800'
+                                          : 'bg-stone-50 dark:bg-stone-900 text-stone-600 dark:text-stone-400 border-stone-200 dark:border-stone-700'
+                                      }`}
+                                    >
+                                      {isSaved ? (
+                                        <Check className="w-3.5 h-3.5" />
+                                      ) : (
+                                        <Download className="w-3.5 h-3.5" />
+                                      )}
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </section>
+              );
+            })}
+          </div>
+
+          <PaginationBar
+            currentPage={pagination.currentPage}
+            totalPages={pagination.totalPages}
+            totalItems={pagination.totalItems}
+            startIndex={pagination.startIndex}
+            endIndex={pagination.endIndex}
+            pageNumbers={pagination.pageNumbers}
+            itemLabel="CDs"
+            onSelectPage={setCurrentPage}
+          />
+        </>
       )}
     </div>
   );

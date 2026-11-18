@@ -398,3 +398,65 @@ export function getReadingProgressPercent(
   const clamped = Math.min(Math.max(1, pageNumber), totalPages);
   return Math.round((clamped / totalPages) * 100);
 }
+
+export interface PaginationResult<T> {
+  items: T[];
+  currentPage: number;
+  totalPages: number;
+  totalItems: number;
+  startIndex: number;
+  endIndex: number;
+  pageNumbers: (number | 'ellipsis')[];
+}
+
+export function paginateItems<T>(
+  allItems: T[],
+  page: number,
+  pageSize = 15
+): PaginationResult<T> {
+  const safePageSize = Math.max(1, Math.floor(pageSize));
+  const totalItems = allItems.length;
+  const totalPages = Math.max(1, Math.ceil(totalItems / safePageSize));
+  const currentPage = Math.min(Math.max(1, Math.floor(page) || 1), totalPages);
+  const startIndex = (currentPage - 1) * safePageSize;
+  const endIndex = Math.min(startIndex + safePageSize, totalItems);
+  const items = allItems.slice(startIndex, endIndex);
+
+  const pageNumbers: (number | 'ellipsis')[] = [];
+  if (totalPages <= 9) {
+    for (let i = 1; i <= totalPages; i++) {
+      pageNumbers.push(i);
+    }
+  } else {
+    const pagesSet = new Set<number>([
+      1,
+      2,
+      3,
+      totalPages,
+      currentPage - 1,
+      currentPage,
+      currentPage + 1,
+    ]);
+    const sorted = Array.from(pagesSet)
+      .filter((p) => p >= 1 && p <= totalPages)
+      .sort((a, b) => a - b);
+
+    for (let i = 0; i < sorted.length; i++) {
+      const p = sorted[i];
+      if (i > 0 && p - sorted[i - 1] > 1) {
+        pageNumbers.push('ellipsis');
+      }
+      pageNumbers.push(p);
+    }
+  }
+
+  return {
+    items,
+    currentPage,
+    totalPages,
+    totalItems,
+    startIndex,
+    endIndex,
+    pageNumbers,
+  };
+}

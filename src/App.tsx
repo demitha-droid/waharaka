@@ -791,15 +791,74 @@ export default function App() {
     [notifications]
   );
 
+  const isPlayerFullScreenRef = useRef(isPlayerFullScreen);
+  useEffect(() => {
+    isPlayerFullScreenRef.current = isPlayerFullScreen;
+  }, [isPlayerFullScreen]);
+
+  const handleOpenFullScreenPlayer = () => {
+    if (!isPlayerFullScreen) {
+      try {
+        window.history.pushState({ waharakaModal: 'fullscreen-player' }, '');
+      } catch {
+        // Ignore in restricted history contexts
+      }
+      setIsPlayerFullScreen(true);
+    }
+  };
+
+  const handleMinimizeFullScreenPlayer = () => {
+    setIsPlayerFullScreen(false);
+    if (window.history.state?.waharakaModal === 'fullscreen-player') {
+      try {
+        window.history.back();
+      } catch {
+        // Ignore
+      }
+    }
+  };
+
+  // Intercept Android hardware/system Back button (popstate) and Escape key when Full-Screen Player is open so it minimizes instead of closing the app
+  useEffect(() => {
+    const handlePopState = () => {
+      if (isPlayerFullScreenRef.current) {
+        setIsPlayerFullScreen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        isPlayerFullScreenRef.current &&
+        (e.key === 'Escape' || e.key === 'GoBack' || e.key === 'BrowserBack')
+      ) {
+        e.preventDefault();
+        handleMinimizeFullScreenPlayer();
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   const handleClosePlayer = () => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current = null;
     }
+    const wasFullScreen = isPlayerFullScreen;
     setIsPlaying(false);
     setIsPlayerFullScreen(false);
     setCurrentTimeSec(0);
     setCurrentSermon(null);
+    if (wasFullScreen && window.history.state?.waharakaModal === 'fullscreen-player') {
+      try {
+        window.history.back();
+      } catch {
+        // Ignore
+      }
+    }
   };
 
   const handlePrevSermon = () => {
@@ -823,7 +882,7 @@ export default function App() {
   return (
     <div
       id="top"
-      className="min-h-screen flex flex-col pb-24 bg-white dark:bg-black text-zinc-950 dark:text-white"
+      className="min-h-screen flex flex-col pb-40 bg-white dark:bg-black text-zinc-950 dark:text-white"
     >
       <TopBar
         activeTab={activeTab}
@@ -913,7 +972,7 @@ export default function App() {
         )}
       </main>
 
-      {/* Native Android Floating Mini-Player (Swipe Left/Right to Close, Tap for Full Screen) */}
+      {/* Native Android Floating Mini-Player + Permanent Bottom Navigation Dock */}
       <AudioPlayerBar
         currentSermon={currentSermon}
         isPlaying={isPlaying}
@@ -921,8 +980,10 @@ export default function App() {
         currentTimeSec={currentTimeSec}
         playbackRate={playbackRate}
         isSavedOffline={Boolean(currentSermon && offlineSermons[currentSermon.id])}
-        onOpenFullScreen={() => setIsPlayerFullScreen(true)}
-        onMinimizePlayer={() => setIsPlayerFullScreen(false)}
+        activeTab={activeTab}
+        onSelectTab={setActiveTab}
+        onOpenFullScreen={handleOpenFullScreenPlayer}
+        onMinimizePlayer={handleMinimizeFullScreenPlayer}
         onClosePlayer={handleClosePlayer}
         onTogglePlay={handleTogglePlayCurrent}
         onSeek={handleSeek}
