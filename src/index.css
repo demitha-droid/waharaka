@@ -8,11 +8,24 @@
     --font-mono: 'JetBrains Mono', monospace;
   }
 
+  html,
   body {
     font-family: var(--font-sans);
+    background-color: #ffffff;
+    color: #09090b;
+    overscroll-behavior-y: none;
+    -webkit-tap-highlight-color: transparent;
   }
 
-  h1, h2, .font-serif-display {
+  html.dark,
+  html.dark body {
+    background-color: #000000;
+    color: #ffffff;
+  }
+
+  h1,
+  h2,
+  .font-serif-display {
     font-family: var(--font-display);
   }
 
@@ -20,4 +33,12 @@
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
   }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

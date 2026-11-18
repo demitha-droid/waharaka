@@ -73,7 +73,7 @@ export const MagazinesView: React.FC<MagazinesViewProps> = ({
         <div
           role="tablist"
           aria-label="Filter magazines by publication year"
-          className="flex items-center gap-1 p-1 bg-stone-200/70 dark:bg-stone-900 rounded-xl overflow-x-auto max-w-full border border-stone-200 dark:border-stone-800"
+          className="flex items-center gap-1 p-1 bg-stone-200/70 dark:bg-zinc-950 rounded-xl overflow-x-auto max-w-full border border-stone-200 dark:border-stone-800"
         >
           {MAGAZINE_YEARS.map((yr) => {
             const active = selectedYear === yr;
@@ -98,7 +98,7 @@ export const MagazinesView: React.FC<MagazinesViewProps> = ({
       </div>
 
       {visibleMagazines.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
+        <div className="p-12 text-center rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-zinc-950">
           <p className="text-base font-medium text-stone-800 dark:text-stone-200">
             No magazine issues match your current search or year filter.
           </p>
@@ -119,7 +119,7 @@ export const MagazinesView: React.FC<MagazinesViewProps> = ({
             return (
               <article
                 key={issue.id}
-                className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden flex flex-col justify-between"
+                className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-zinc-950 overflow-hidden flex flex-col justify-between"
               >
                 <div className="p-5 space-y-3.5">
                   <div className="flex gap-4 items-start">

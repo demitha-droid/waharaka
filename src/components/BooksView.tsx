@@ -54,7 +54,7 @@ export const BooksView: React.FC<BooksViewProps> = ({
       </div>
 
       {books.length === 0 ? (
-        <div className="p-10 text-center rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
+        <div className="p-10 text-center rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-zinc-950">
           <p className="text-sm sm:text-base font-medium text-stone-800 dark:text-stone-200">
             No Dhamma books match your current search or offline filter.
           </p>
@@ -75,7 +75,7 @@ export const BooksView: React.FC<BooksViewProps> = ({
             return (
               <article
                 key={book.id}
-                className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 p-4 sm:p-6 space-y-3.5"
+                className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-zinc-950 p-4 sm:p-6 space-y-3.5"
               >
                 {/* Mobile-Friendly Side-by-Side Header Row: Cover Sprite + Book Title & Metadata */}
                 <div className="flex items-start gap-3.5 sm:gap-5">

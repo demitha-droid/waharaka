@@ -46,7 +46,7 @@ import {
 } from './components/NotificationCenterModal';
 
 const LS_KEYS = {
-  DARK_MODE: 'waharaka_dark_mode_v2',
+  DARK_MODE: 'waharaka_amoled_mode_v3',
   OFFLINE_SERMONS: 'waharaka_offline_sermons_v2',
   OFFLINE_READINGS: 'waharaka_offline_readings_v2',
   READING_PROGRESS: 'waharaka_reading_progress_v2',
@@ -81,9 +81,9 @@ export default function App() {
   const [loadingCdIds, setLoadingCdIds] = useState<Record<string, boolean>>({});
   const [liveSearchSermons, setLiveSearchSermons] = useState<SermonItem[]>([]);
 
-  // Dark / Night mode persisted in localStorage and synced with <html class="dark">
+  // AMOLED / Light mode persisted in localStorage and synced with <html class="dark">
   const [isDarkMode, setIsDarkMode] = useState<boolean>(() =>
-    readLocalStorage(LS_KEYS.DARK_MODE, false)
+    readLocalStorage(LS_KEYS.DARK_MODE, true)
   );
 
   // Offline Sermons auto-saved to localStorage
@@ -125,6 +125,7 @@ export default function App() {
     WAHARAKA_SERMONS[0] || null
   );
   const [isPlaying, setIsPlaying] = useState(false);
+  const [isPlayerFullScreen, setIsPlayerFullScreen] = useState(false);
   const [currentTimeSec, setCurrentTimeSec] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -790,10 +791,39 @@ export default function App() {
     [notifications]
   );
 
+  const handleClosePlayer = () => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setIsPlaying(false);
+    setIsPlayerFullScreen(false);
+    setCurrentTimeSec(0);
+    setCurrentSermon(null);
+  };
+
+  const handlePrevSermon = () => {
+    if (!currentSermon) return;
+    const pool = filteredSermons.length > 0 ? filteredSermons : allAvailableSermons;
+    if (pool.length === 0) return;
+    const idx = pool.findIndex((s) => s.id === currentSermon.id);
+    const prevIdx = idx > 0 ? idx - 1 : pool.length - 1;
+    handlePlaySermon(pool[prevIdx]);
+  };
+
+  const handleNextSermon = () => {
+    if (!currentSermon) return;
+    const pool = filteredSermons.length > 0 ? filteredSermons : allAvailableSermons;
+    if (pool.length === 0) return;
+    const idx = pool.findIndex((s) => s.id === currentSermon.id);
+    const nextIdx = idx >= 0 && idx < pool.length - 1 ? idx + 1 : 0;
+    handlePlaySermon(pool[nextIdx]);
+  };
+
   return (
     <div
       id="top"
-      className="min-h-screen flex flex-col pb-36 bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100"
+      className="min-h-screen flex flex-col pb-24 bg-white dark:bg-black text-zinc-950 dark:text-white"
     >
       <TopBar
         activeTab={activeTab}
@@ -816,7 +846,7 @@ export default function App() {
           aria-live="polite"
           className="max-w-7xl mx-auto w-full px-3 sm:px-6 pt-3"
         >
-          <div className="px-3.5 py-2.5 rounded-xl bg-amber-900 text-amber-50 dark:bg-amber-500 dark:text-stone-950 text-xs font-medium flex items-center justify-between gap-3 shadow-sm">
+          <div className="px-3.5 py-2.5 rounded-xl bg-amber-900 text-amber-50 dark:bg-amber-500 dark:text-zinc-950 text-xs font-medium flex items-center justify-between gap-3 shadow-sm">
             <span>{statusBanner}</span>
             <button
               type="button"
@@ -830,7 +860,7 @@ export default function App() {
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-4 sm:py-6">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 py-3 sm:py-5">
         {activeTab === 'sermons' && (
           <SermonsView
             sermons={filteredSermons}
@@ -883,39 +913,22 @@ export default function App() {
         )}
       </main>
 
-      {/* Clean Footer */}
-      <footer className="max-w-7xl w-full mx-auto px-3 sm:px-6 py-6 border-t border-stone-200 dark:border-stone-800 text-xs text-stone-500 dark:text-stone-400 flex flex-col sm:flex-row items-center justify-between gap-3">
-        <p className="text-center sm:text-left">
-          Waharaka Dhamma Archive · 129 CDs, 23 Books & 100 Hela Bodu Piyuma Volumes (Sabbadanam Dhammadanam Jinati)
-        </p>
-        <div className="flex items-center gap-3">
-          <a
-            href="https://www.waharaka.com/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hover:text-stone-900 dark:hover:text-stone-200 underline"
-          >
-            Official Waharaka.com Portal
-          </a>
-          <span>·</span>
-          <span className="font-mono-tabular">
-            Local Storage Vault: {offlineStats.totalSizeMb} MB Cached
-          </span>
-        </div>
-      </footer>
-
-      {/* Persistent Audio Player & Android Mobile Bottom Navigation */}
+      {/* Native Android Floating Mini-Player (Swipe Left/Right to Close, Tap for Full Screen) */}
       <AudioPlayerBar
         currentSermon={currentSermon}
         isPlaying={isPlaying}
+        isFullScreen={isPlayerFullScreen}
         currentTimeSec={currentTimeSec}
         playbackRate={playbackRate}
         isSavedOffline={Boolean(currentSermon && offlineSermons[currentSermon.id])}
-        activeTab={activeTab}
-        onSelectTab={setActiveTab}
+        onOpenFullScreen={() => setIsPlayerFullScreen(true)}
+        onMinimizePlayer={() => setIsPlayerFullScreen(false)}
+        onClosePlayer={handleClosePlayer}
         onTogglePlay={handleTogglePlayCurrent}
         onSeek={handleSeek}
         onSkip={handleSkip}
+        onPrevSermon={handlePrevSermon}
+        onNextSermon={handleNextSermon}
         onCyclePlaybackRate={handleCyclePlaybackRate}
         onToggleOffline={handleToggleOfflineSermon}
       />

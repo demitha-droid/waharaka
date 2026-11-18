@@ -218,7 +218,7 @@ export const SermonsView: React.FC<SermonsViewProps> = ({
         <div
           role="tablist"
           aria-label="Filter sermons by Waharaka collection"
-          className="flex items-center gap-1.5 p-1 bg-stone-200/70 dark:bg-stone-900 rounded-xl overflow-x-auto max-w-full border border-stone-200 dark:border-stone-800"
+          className="flex items-center gap-1.5 p-1 bg-stone-200/70 dark:bg-zinc-950 rounded-xl overflow-x-auto max-w-full border border-stone-200 dark:border-stone-800"
         >
           {CATEGORIES.map((category) => {
             const active =
@@ -249,7 +249,7 @@ export const SermonsView: React.FC<SermonsViewProps> = ({
           <button
             type="button"
             onClick={() => onDownloadAllVisible(sermons.slice(0, 12))}
-            className="min-h-[38px] px-3 py-1.5 text-xs font-medium text-stone-700 dark:text-stone-300 bg-white dark:bg-stone-900 hover:bg-stone-100 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-800 rounded-xl flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
+            className="min-h-[38px] px-3 py-1.5 text-xs font-medium text-stone-700 dark:text-stone-300 bg-white dark:bg-zinc-950 hover:bg-stone-100 dark:hover:bg-stone-800 border border-stone-200 dark:border-stone-800 rounded-xl flex items-center justify-center gap-1.5 transition-colors whitespace-nowrap shrink-0"
           >
             <Download className="w-3.5 h-3.5 text-amber-700 dark:text-amber-500" />
             <span>Save Top {Math.min(12, sermons.length)} Offline</span>
@@ -259,14 +259,14 @@ export const SermonsView: React.FC<SermonsViewProps> = ({
 
       {/* Sermons List */}
       {isLoadingTagSermons && sermons.length === 0 ? (
-        <div className="p-10 text-center rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 flex flex-col items-center gap-2">
+        <div className="p-10 text-center rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-zinc-950 flex flex-col items-center gap-2">
           <Loader2 className="w-6 h-6 animate-spin text-amber-700 dark:text-amber-400" />
           <p className="text-sm font-medium text-stone-700 dark:text-stone-300">
             Loading sermons for "{selectedHomepageTag?.name}" from waharaka.com...
           </p>
         </div>
       ) : sermons.length === 0 ? (
-        <div className="p-10 text-center rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
+        <div className="p-10 text-center rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-zinc-950">
           <p className="text-sm sm:text-base font-medium text-stone-800 dark:text-stone-200">
             No sermons match your current filter or search query.
           </p>
@@ -275,7 +275,7 @@ export const SermonsView: React.FC<SermonsViewProps> = ({
           </p>
         </div>
       ) : (
-        <div className="divide-y divide-stone-200 dark:divide-stone-800 rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden">
+        <div className="divide-y divide-stone-200 dark:divide-stone-800 rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-zinc-950 overflow-hidden">
           {sermons.map((sermon, idx) => {
             const isCurrent = currentPlayingId === sermon.id;
             const isSavedOffline = Boolean(offlineSermons[sermon.id]);

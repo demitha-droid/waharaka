@@ -92,7 +92,7 @@ export const CDsView: React.FC<CDsViewProps> = ({
         <div
           role="tablist"
           aria-label="Filter CD collections"
-          className="flex items-center gap-1 p-1 bg-stone-200/70 dark:bg-stone-900 rounded-xl border border-stone-200 dark:border-stone-800 overflow-x-auto max-w-full shrink-0"
+          className="flex items-center gap-1 p-1 bg-stone-200/70 dark:bg-zinc-950 rounded-xl border border-stone-200 dark:border-stone-800 overflow-x-auto max-w-full shrink-0"
         >
           <button
             type="button"
@@ -137,7 +137,7 @@ export const CDsView: React.FC<CDsViewProps> = ({
       </div>
 
       {visibleCds.length === 0 ? (
-        <div className="p-12 text-center rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900">
+        <div className="p-12 text-center rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-zinc-950">
           <p className="text-base font-medium text-stone-800 dark:text-stone-200">
             No CD collections match your search query.
           </p>
@@ -155,7 +155,7 @@ export const CDsView: React.FC<CDsViewProps> = ({
             return (
               <section
                 key={cd.id}
-                className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-stone-900 overflow-hidden flex flex-col justify-between"
+                className="rounded-2xl border border-stone-200 dark:border-stone-800 bg-white dark:bg-zinc-950 overflow-hidden flex flex-col justify-between"
               >
                 <div className="p-5 space-y-4">
                   <div className="flex gap-4 items-center">
