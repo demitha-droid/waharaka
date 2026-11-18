@@ -1,0 +1,6 @@
+{
+  "name": "Waharaka Dhamma Archive",
+  "description": "Android-first Dhamma companion for listening to Waharaka sermons, browsing CD collections, and reading magazines and books offline with night mode and push notifications.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
