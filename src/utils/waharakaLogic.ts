@@ -460,3 +460,132 @@ export function paginateItems<T>(
     pageNumbers,
   };
 }
+
+export interface AriyaDhammaLogoOption {
+  id: number;
+  code: string;
+  title: string;
+  sinhalaTitle: string;
+  symbolName: string;
+  tagline: string;
+  description: string;
+  accentStyle: string;
+}
+
+export const ARIYA_DHAMMA_LOGOS: AriyaDhammaLogoOption[] = [
+  {
+    id: 1,
+    code: 'dhammacakka',
+    title: 'AriyaDhamma · Dhammacakka',
+    sinhalaTitle: 'අරිය ධම්ම · ධම්මචක්කය',
+    symbolName: 'Eight-Spoke Dhamma Wheel',
+    tagline: 'අරිය අෂ්ඨාංගික මග · Noble Eightfold Path',
+    description:
+      'Eight sacred spokes radiating from the hub of Nibbana, encircled by Sila, Samadhi, and Panna.',
+    accentStyle: 'from-amber-500 to-yellow-600',
+  },
+  {
+    id: 2,
+    code: 'paduma-lotus',
+    title: 'AriyaDhamma · Sacred Paduma',
+    sinhalaTitle: 'අරිය ධම්ම · පදුම පද්මය',
+    symbolName: 'Blooming Lotus & Dhamma Sun',
+    tagline: 'ලෝකයෙන් නොඇලී පිපෙන පද්මය · Unstained Awakening',
+    description:
+      'An eight-petalled lotus rising pure above the waters of Samsara with a radiant sun of wisdom.',
+    accentStyle: 'from-amber-400 to-orange-600',
+  },
+  {
+    id: 3,
+    code: 'bodhi-leaf',
+    title: 'AriyaDhamma · Siri Maha Bodhi',
+    sinhalaTitle: 'අරිය ධම්ම · ජය ශ්‍රී මහා බෝධි පත්‍රය',
+    symbolName: 'Sacred Bo Leaf & Wheel',
+    tagline: 'සම්මා සම්බෝධි ඥානය · Supreme Enlightenment',
+    description:
+      'Sacred heart-shaped Bodhi leaf with its classic elongated drip-tip cradling a golden Dhamma wheel.',
+    accentStyle: 'from-emerald-500 to-amber-500',
+  },
+  {
+    id: 4,
+    code: 'triratna-tilakkhana',
+    title: 'AriyaDhamma · Tilakkhana Gem',
+    sinhalaTitle: 'අරිය ධම්ම · තිසරණ හා තිලකුණ',
+    symbolName: 'Triple Gem & Three Characteristics',
+    tagline: 'අනිච්ච · දුක්ඛ · අනත්ත · Triratna Crest',
+    description:
+      'Three luminous jewels atop a lotus base signifying Buddha, Dhamma, Sangha and Anicca, Dukkha, Anatta.',
+    accentStyle: 'from-amber-500 to-red-500',
+  },
+  {
+    id: 5,
+    code: 'hela-stupa',
+    title: 'AriyaDhamma · Hela Dagoba',
+    sinhalaTitle: 'අරිය ධම්ම · සෑ රදුන්',
+    symbolName: 'Sacred Stupa & Spire Halo',
+    tagline: 'ධාතු නිධාන මහා සෑය · Reliquary of Peace',
+    description:
+      'Traditional Sri Lankan Bubbulakara Stupa dome with Hatharas Kotuwa and Koth Kerella radiating serenity.',
+    accentStyle: 'from-yellow-400 to-amber-600',
+  },
+  {
+    id: 6,
+    code: 'chatra-parasol',
+    title: 'AriyaDhamma · Sovereign Chatra',
+    sinhalaTitle: 'අරිය ධම්ම · සදහම් ඡත්‍රය',
+    symbolName: 'Three-Tiered Royal Parasol',
+    tagline: 'තුන් ලොවටම සෙවණ දෙන දහම · Canopy of Refuge',
+    description:
+      'Auspicious royal parasol (Chatra) symbolizing the supreme spiritual protection of the Noble Dhamma.',
+    accentStyle: 'from-amber-500 to-amber-700',
+  },
+  {
+    id: 7,
+    code: 'panna-pahana',
+    title: 'AriyaDhamma · Aloka Pahana',
+    sinhalaTitle: 'අරිය ධම්ම · ප්‍රඥා ආලෝක පහන',
+    symbolName: 'Traditional Lamp of Wisdom',
+    tagline: 'අවිද්‍යා අඳුර දුරු කරන ප්‍රඥා ආලෝකය · Light of Prajna',
+    description:
+      'Classic Sinhala brass Pahana oil lamp with a serene flame dispelling the darkness of ignorance.',
+    accentStyle: 'from-orange-400 to-amber-600',
+  },
+  {
+    id: 8,
+    code: 'dhamma-sankha',
+    title: 'AriyaDhamma · Dakshinavarta Sankha',
+    sinhalaTitle: 'අරිය ධම්ම · දහම් සංඛ නාදය',
+    symbolName: 'Sacred Right-Turning Conch',
+    tagline: 'සීහනාද ධම්ම ඝෝෂාව · Fearless Call of Truth',
+    description:
+      'Auspicious clockwise-spiraling conch shell proclaiming the authentic Tathagata Deshana across the world.',
+    accentStyle: 'from-amber-300 to-amber-600',
+  },
+  {
+    id: 9,
+    code: 'sandakada-pahana',
+    title: 'AriyaDhamma · Sandakada Pahana',
+    sinhalaTitle: 'අරිය ධම්ම · සඳකඩ පහණ',
+    symbolName: 'Moonstone Threshold of Nibbana',
+    tagline: 'සසර ගිනි නිවාලන නිවන් දොරටුව · Gateway to Liberation',
+    description:
+      'Concentric moonstone arcs of flames, sacred Hansa swan symbolism, and central lotus petals.',
+    accentStyle: 'from-amber-500 to-stone-500',
+  },
+  {
+    id: 10,
+    code: 'ariya-magga-knot',
+    title: 'AriyaDhamma · Ariya Magga Mandala',
+    sinhalaTitle: 'අරිය ධම්ම · පටිච්චසමුප්පාද චක්‍රය',
+    symbolName: 'Auspicious Knot & Bodhi Halo',
+    tagline: 'හේතු ඵල දහම සහ නිවීම · Cessation of Suffering',
+    description:
+      'Interwoven Buddhist emblem inside a lotus-wheel mandala representing Dependent Origination and release.',
+    accentStyle: 'from-amber-400 to-yellow-500',
+  },
+];
+
+export function getAriyaDhammaLogoById(id: number): AriyaDhammaLogoOption {
+  return ARIYA_DHAMMA_LOGOS.find((logo) => logo.id === id) || ARIYA_DHAMMA_LOGOS[0];
+}
+

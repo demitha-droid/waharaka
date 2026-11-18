@@ -7,6 +7,7 @@ import {
   HardDriveDownload,
   X,
 } from 'lucide-react';
+import { AriyaDhammaLogoMark } from './AriyaDhammaLogos';
 
 export type ActiveTab = 'sermons' | 'cds' | 'magazines' | 'books';
 
@@ -55,12 +56,19 @@ export const TopBar: React.FC<TopBarProps> = ({
             e.preventDefault();
             onSelectTab('sermons');
           }}
-          className="text-lg sm:text-2xl font-bold tracking-tight text-zinc-950 dark:text-white font-serif-display whitespace-nowrap shrink-0"
+          aria-label="AriyaDhamma Home"
+          className="inline-flex items-center gap-2.5 min-w-0 shrink-0 group"
         >
-          Waharaka Dhamma
+          <AriyaDhammaLogoMark
+            logoId={2}
+            className="w-9 h-9 sm:w-10 sm:h-10 shrink-0 transition-transform group-hover:scale-105"
+          />
+          <span className="text-xl sm:text-2xl font-bold tracking-tight text-zinc-950 dark:text-white font-serif-display whitespace-nowrap leading-none">
+            Ariya<span className="text-amber-600 dark:text-amber-400">Dhamma</span>
+          </span>
         </a>
 
-        {/* Right Utility Pills: Offline Vault, Push Updates, AMOLED/Light Mode */}
+        {/* Right Utility Controls: Offline Vault, Push Updates, AMOLED/Light Mode */}
         <div className="flex items-center gap-1.5 shrink-0">
           <button
             type="button"

@@ -11,6 +11,8 @@ import {
   calculateOfflineStorageStats,
   getReadingProgressPercent,
   paginateItems,
+  ARIYA_DHAMMA_LOGOS,
+  getAriyaDhammaLogoById,
   type SermonItem,
   type CDCollection,
 } from './waharakaLogic';
@@ -154,3 +156,16 @@ test('paginateItems slices 15 posts per page and generates numbered pages 1, 2, 
   assert.equal(page3.items[0], 'Post-31');
   assert.equal(page3.items[9], 'Post-40');
 });
+
+test('ARIYA_DHAMMA_LOGOS defines 10 distinct Buddhist symbol logos implementing AriyaDhamma', () => {
+  assert.equal(ARIYA_DHAMMA_LOGOS.length, 10);
+  const ids = ARIYA_DHAMMA_LOGOS.map((l) => l.id);
+  assert.deepEqual(ids, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  for (const logo of ARIYA_DHAMMA_LOGOS) {
+    assert.ok(logo.title.includes('AriyaDhamma'));
+    assert.ok(logo.sinhalaTitle.includes('අරිය ධම්ම'));
+  }
+  assert.equal(getAriyaDhammaLogoById(3).code, 'bodhi-leaf');
+  assert.equal(getAriyaDhammaLogoById(999).id, 1);
+});
+
